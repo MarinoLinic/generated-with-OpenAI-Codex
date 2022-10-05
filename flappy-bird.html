@@ -1,0 +1,93 @@
+<html>
+    <head>   
+    </head>
+    <body>
+      <script>
+        // Made by Marino Linic and OpenAI Codex Beta (https://beta.openai.com/codex-javascript-sandbox)
+        window.onload = function() {
+          /* Make a Flappy Bird clone */
+          var canvas = document.createElement('canvas');
+          canvas.width = window.innerWidth;
+          canvas.height = window.innerHeight;
+          document.body.appendChild(canvas);
+          var ctx = canvas.getContext('2d');
+          var bird = {
+            x: canvas.width / 2,
+            y: canvas.height / 2,
+            vy: 0,
+            gravity: 0.5,
+            jump: -5,
+            radius: 10,
+            color: '#ff0000',
+            draw: function() {
+              ctx.beginPath();
+              ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, true);
+              ctx.closePath();
+              ctx.fillStyle = this.color;
+              ctx.fill();
+            }
+          };
+          var pipes = [];
+          var pipeWidth = 50;
+          var pipeGap = 100;
+          var pipeSpeed = -2;
+          var pipeInterval = 200;
+          var lastPipe = 0;
+          function drawPipes() {
+            for (var i = 0; i < pipes.length; i++) {
+              ctx.fillStyle = '#00ff00';
+              ctx.fillRect(pipes[i].x, 0, pipeWidth, pipes[i].top);
+              ctx.fillRect(pipes[i].x, pipes[i].bottom, pipeWidth, canvas.height - pipes[i].bottom);
+            }
+          }
+          function updatePipes() {
+            for (var i = 0; i < pipes.length; i++) {
+              pipes[i].x += pipeSpeed;
+            }
+            if (pipes.length > 0 && pipes[0].x < -pipeWidth) {
+              pipes.shift();
+            }
+            if (pipes.length == 0 || pipes[pipes.length - 1].x < canvas.width - pipeInterval) {
+              gap = canvas.height*0.3 + Math.random() * (canvas.height*0.3 - pipeGap)
+              pipes.push({
+                x: canvas.width,
+                top: gap,
+                bottom: canvas.height - gap + pipeGap
+              });
+            }
+          }
+          function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            bird.draw();
+            drawPipes();
+            updatePipes();
+            bird.vy += bird.gravity;
+            bird.y += bird.vy;
+            if (bird.y + bird.radius > canvas.height) {
+              bird.y = canvas.height - bird.radius;
+              bird.vy = 0;
+            }
+            if (bird.y - bird.radius < 0) {
+              bird.y = bird.radius;
+              bird.vy = 0;
+            }
+            for (var i = 0; i < pipes.length; i++) {
+              if (bird.x + bird.radius > pipes[i].x && bird.x - bird.radius < pipes[i].x + pipeWidth) {
+                if (bird.y - bird.radius < pipes[i].top || bird.y + bird.radius > pipes[i].bottom) {
+                  bird.vy = 0;
+                  bird.y = bird.y - bird.radius < pipes[i].top ? pipes[i].top - bird.radius : pipes[i].bottom + bird.radius;
+                }
+              }
+            }
+            requestAnimationFrame(draw);
+          }
+          document.addEventListener('keydown', function(e) {
+            if (e.keyCode == 32) {
+              bird.vy = bird.jump;
+            }
+          });
+          draw();
+        }
+        </script>
+    </body
+</html>
